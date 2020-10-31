@@ -1,9 +1,9 @@
-#include "myKeyboard.h"
+ #include "myKeyboard.h"
 
-//#define DEBUG
+#define DEBUG
 
 #define ps_clk 3
-#define ps_data 4
+#define ps_data 2
 
 #define BREAK_KEY 0xF0
 #define SPECIAL_KEY 0xE0
@@ -106,16 +106,17 @@ keyMap map_1[] = {
 	{97, 0x7D}, // Keypad 9
 	{48, 0x5B}, // ]
 	{51, 0x4C}, // ;
-	{ 52, 0x52}, // \'
+	{52, 0x52}, // \'
 	{54, 0x41}, // ,
 	{55, 0x49}, // .
 	{56, 0x4A}, // /
+  {227, 0x61}
 };
 
 keyMap map_2[] = {
 	{70, 0x12}, // prt scr
-    {56, 0x4A}, // /
-  	{40, 0x5A}, // keypad enter
+  {56, 0x4A}, // /
+	{40, 0x5A}, // keypad enter
 	{227, 0xFF}, // left gui
 	{231, 0xFF}, // right gui
 	{228, 0x14}, // right ctrl
@@ -143,7 +144,7 @@ byte break_k = 0; // flag 0=no break 1=break
 byte hex_code_is = 0; // flag if 0 no data, if 1 data
 unsigned char hex_code;
 
-myKeyboard myKb;
+myKeyboard_ myKeyboard;
 
 void setup() {
 	#ifdef DEBUG
@@ -167,7 +168,7 @@ void loop() {
 		#endif
 		
 		if(code == (unsigned char)SPECIAL_KEY){
-			if(special_k = 1) hex_code_is = 0;
+			if(special_k == 1) hex_code_is = 0;
 			special_k = 1;
 			#ifdef DEBUG
 			Serial.println("special found");
@@ -187,6 +188,7 @@ void loop() {
 			#endif
 			hex_code_is = 1;
 		}
+   
 		if(hex_code_is == 1){
 			if((special_k == 0) && (break_k == 0)){
 				press_key(hex_code);
@@ -201,24 +203,22 @@ void loop() {
 				#ifdef DEBUG
 				Serial.println("-----------------");
 				#endif
-
-				
 			}
 			else if((special_k == 1) && (break_k == 0)) {
 				press_special_key(hex_code);
 			}
 			else if((special_k == 1) && (break_k == 1)){
-                               release_special_key(hex_code);
-                                  
-                               special_k = 0;
-                               break_k = 0;
-                               hex_code_is = 0;
+        release_special_key(hex_code);
+          
+        special_k = 0;
+        break_k = 0;
+        hex_code_is = 0;
                                 
-				
-				#ifdef DEBUG
-				Serial.println("-----------------");
-				#endif
-			}
+  			
+  			#ifdef DEBUG
+  			Serial.println("-----------------");
+  			#endif
+		  }
 		}
 	}
 }
@@ -231,7 +231,7 @@ void release_key(unsigned char code) {
 			#ifdef DEBUG
 			Serial.println("-release-");
 			#endif
-			myKb.release_sc(map_1[i].usb_id);
+			myKeyboard.release_sc(map_1[i].usb_id);
 			break;
 		}
 	}
@@ -245,7 +245,7 @@ void press_key(unsigned char code) {
 			#ifdef DEBUG
 			Serial.println("-pressed-");
 			#endif
-			myKb.press_sc(map_1[i].usb_id);
+			myKeyboard.press_sc(map_1[i].usb_id);
 			break;
 		}
 	}
@@ -259,7 +259,7 @@ void release_special_key(unsigned char code) {
 			#ifdef DEBUG
 			Serial.println("-s_release-");
 			#endif
-			myKb.release_sc(map_2[i].usb_id);
+			myKeyboard.release_sc(map_2[i].usb_id);
 			break;
 		}
 	}
@@ -273,7 +273,7 @@ void press_special_key(unsigned char code) {
 			#ifdef DEBUG
 			Serial.println(" -s_pressed-");
 			#endif
-			myKb.press_sc(map_2[i].usb_id);
+			myKeyboard.press_sc(map_2[i].usb_id);
 			break;
 		}
 	}
